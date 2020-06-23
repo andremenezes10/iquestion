@@ -1,0 +1,15 @@
+1;Azul;false;1
+2;Vermelho;false;1
+2;Branco;true;1
+4;Preto;false;1
+5;Amarelo;false;1
+6;1;false;2
+7;2;true;2
+8;3;false;2
+9;4;false;2
+10;5;false;2
+11;1kg de chumbo;false;3
+12;1kg de algodão;false;3
+13;1kg de palha;false;3
+14;1kg de ouro;false;3
+15;Todas as respostas tem pesos iguais;true;3

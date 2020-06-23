@@ -1,0 +1,4 @@
+1;true;multipla escolha; Qual a cor do cavalo branco de napoleao?;0;1;1
+2;true;multipla escolha; Quanto é 1+1?;0;1;1
+3;true;multipla escolha; Qual pesa mais?;0;1;1
+4;true;multipla escolha; Qual pesa mais?;0;1;2
