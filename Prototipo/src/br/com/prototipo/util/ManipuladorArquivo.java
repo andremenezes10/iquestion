@@ -399,7 +399,7 @@ public class ManipuladorArquivo {
 
 	// retorna todas as materias
 	public Materia[] pegarTodasMaterias() throws IOException {
-		BufferedReader buffReadMateria = new BufferedReader(new FileReader("files/Disciplina.txt"));
+		BufferedReader buffReadMateria = new BufferedReader(new FileReader("files/Materia.txt"));
 
 		String linhaMateria = buffReadMateria.readLine();
 
@@ -748,26 +748,40 @@ public class ManipuladorArquivo {
 
 	}
 
-	public Prova corrigirProva(Integer nota, Integer idProva) {
+	public Prova corrigirProva(Double nota, Integer idProva) throws IOException {
 
-		String arquivo = "ARQUIVO";
-		String arquivoTmp = "ARQUIVO-tmp";
+		String arquivo = "files/Prova.txt";
+		String arquivoTmp = "files/Prova-tmp";
 
 		BufferedWriter writer = new BufferedWriter(new FileWriter(arquivoTmp));
 		BufferedReader reader = new BufferedReader(new FileReader(arquivo));
 
 		String linha;
-		String segments[] = linha.split(";");
-		/*
-		 * if (Integer.parseInt(segments[0]) == idPRova) { while ((linha =
-		 * reader.readLine()) != null) { if (linha.contains(palavraAntiga)) { linha =
-		 * linha.replace(palavraAntiga, palavraNova); } writer.write(linha + "\n"); }
-		 * 
-		 * } writer.close(); reader.close();
-		 * 
-		 * new File(arquivo).delete(); new File(arquivoTmp).renameTo(new File(arquivo));
-		 * }
-		 */
+		Prova prova = new Prova();
+		while ((linha = reader.readLine()) != null) {
+			String segments[] = linha.split(";");
+			if (segments[0].equals(idProva.toString())) {
+
+				if (linha.contains(";;")) {
+					linha = linha.replace(";;", ";" + nota.toString() + ";");
+				} else if (linha.contains(";null;")) {
+					linha = linha.replace(";null;", ";" + nota.toString() + ";");
+				}
+				prova.setId(Long.parseLong(segments[0]));
+				prova.setNota(nota);
+				prova.setData(segments[1]);
+				prova.setAluno(pegaAluno(Integer.parseInt(segments[3])));
+			}
+			writer.write(linha + "\n");
+		}
+		writer.close();
+		reader.close();
+
+		new File(arquivo).delete();
+		new File(arquivoTmp).renameTo(new File(arquivo));
+
+		return prova;
+
 	}
 
 	public int retornarIdValido(String arq) {

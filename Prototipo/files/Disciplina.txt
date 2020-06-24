@@ -1,1 +1,5 @@
 1;Perguntas Simples;1;
+2;Soma;2;
+3;Divisao;2;
+4;Subtracao;2;
+5;Subtracao;1;
