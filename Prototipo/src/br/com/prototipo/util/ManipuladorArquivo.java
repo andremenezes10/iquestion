@@ -12,6 +12,9 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Random;
 
+import javax.swing.JOptionPane;
+
+import br.com.prototipo.domain.Admin;
 import br.com.prototipo.domain.Alternativa;
 import br.com.prototipo.domain.Aluno;
 import br.com.prototipo.domain.Disciplina;
@@ -21,7 +24,7 @@ import br.com.prototipo.domain.ProvaQuestao;
 import br.com.prototipo.domain.Questao;
 import br.com.prototipo.domain.dto.ProvaDTO;
 import br.com.prototipo.domain.dto.QuestaoDTO;
-import br.com.prototipo.exception.InvalidLoginOrPassword;
+import br.com.prototipo.exception.ErroException;
 
 public class ManipuladorArquivo {
 
@@ -70,11 +73,12 @@ public class ManipuladorArquivo {
 
 					prova.setId(Long.parseLong(segments[0]));
 					prova.setData(segments[1]);
-					if (!segments[2].isEmpty()) {
+
+					if (!segments[2].isEmpty() && !segments[2].equals("null")) {
 						prova.setNota(Double.parseDouble(segments[2]));
 					}
 					prova.setAluno(pegaAluno(Integer.parseInt(segments[3])));
-
+					prova.setDisciplina(pegaDisciplina(Integer.parseInt(segments[4])));
 				}
 
 			} else
@@ -84,6 +88,8 @@ public class ManipuladorArquivo {
 		buffReadProva.close();
 		return prova;
 	}
+
+	// retorna dados do aluno por id
 
 	// retorna dados do aluno por id
 	public Aluno pegaAluno(Integer idAluno) throws IOException {
@@ -117,7 +123,7 @@ public class ManipuladorArquivo {
 	}
 
 	// retorna aluno atraves do (cpf || email) && senha
-	public Aluno login(String key, String password) throws IOException {
+	public Aluno loginAluno(String key, String password) throws IOException {
 		BufferedReader buffReadAluno = new BufferedReader(new FileReader("files/Aluno.txt"));
 		String linhaAluno = buffReadAluno.readLine();
 
@@ -138,8 +144,6 @@ public class ManipuladorArquivo {
 						aluno.setSenha(segments[4]);
 						aluno.setTelefone(segments[5]);
 						aluno.setSexo(segments[6]);
-					} else if (segments[3].equals(key) && !segments[4].equals(password)) {
-						throw new InvalidLoginOrPassword();
 					}
 				} else {
 					if (segments[2].equals(key) && segments[4].equals(password)) {
@@ -151,8 +155,6 @@ public class ManipuladorArquivo {
 						aluno.setSenha(segments[4]);
 						aluno.setTelefone(segments[5]);
 						aluno.setSexo(segments[6]);
-					} else if (segments[2].equals(key) && !segments[4].equals(password)) {
-						throw new InvalidLoginOrPassword();
 					}
 
 				}
@@ -163,6 +165,51 @@ public class ManipuladorArquivo {
 		}
 		buffReadAluno.close();
 		return aluno;
+	}
+
+	// retorna aluno atraves do (cpf || email) && senha
+	public Admin loginAdmin(String key, String password) throws IOException {
+		BufferedReader buffReadAluno = new BufferedReader(new FileReader("files/Admin.txt"));
+		String linhaAdm = buffReadAluno.readLine();
+
+		Admin admin = new Admin();
+		while (true) {
+
+			if (linhaAdm != null) {
+
+				String segments[] = linhaAdm.split(";");
+
+				if (key.contains("@")) {
+					if (segments[3].equals(key) && segments[4].equals(password)) {
+
+						admin.setId(Long.parseLong(segments[0]));
+						admin.setNome(segments[1]);
+						admin.setCpf(segments[2]);
+						admin.setEmail(segments[3]);
+						admin.setSenha(segments[4]);
+						admin.setTelefone(segments[5]);
+						admin.setSexo(segments[6]);
+					}
+				} else {
+					if (segments[2].equals(key) && segments[4].equals(password)) {
+
+						admin.setId(Long.parseLong(segments[0]));
+						admin.setNome(segments[1]);
+						admin.setCpf(segments[2]);
+						admin.setEmail(segments[3]);
+						admin.setSenha(segments[4]);
+						admin.setTelefone(segments[5]);
+						admin.setSexo(segments[6]);
+					}
+
+				}
+
+			} else
+				break;
+			linhaAdm = buffReadAluno.readLine();
+		}
+		buffReadAluno.close();
+		return admin;
 	}
 
 	// Retorna quantidade (integer) de questoes da prova
@@ -378,6 +425,32 @@ public class ManipuladorArquivo {
 		return count;
 	}
 
+	public Integer pegaNumeroDeProvasPorIdDisciplina(Integer idDisciplina) throws IOException {
+		BufferedReader buffRead = new BufferedReader(new FileReader("files/Prova.txt"));
+		String linha = buffRead.readLine();
+
+		Integer count = 0;
+
+		while (true) {
+
+			if (linha != null) {
+
+				String segments[] = linha.split(";");
+
+				if (Integer.parseInt(segments[4]) == idDisciplina) {
+					count++;
+
+				}
+
+			} else
+				break;
+			linha = buffRead.readLine();
+		}
+		buffRead.close();
+
+		return count;
+	}
+
 	// retorna numero de linhas de um arquivo
 	public Integer pegaNumeroDeLinhas(String nomeArquivo) throws IOException {
 		BufferedReader buffRead = new BufferedReader(new FileReader("files/" + nomeArquivo + ".txt"));
@@ -493,6 +566,37 @@ public class ManipuladorArquivo {
 		return disciplinas;
 	}
 
+	// retorna todas as disciplinas vinculadas a uma materia
+	public ProvaDTO[] pegarProvaPorMateria(Integer idDisciplina) throws IOException {
+		BufferedReader buffReadProva = new BufferedReader(new FileReader("files/Prova.txt"));
+
+		String linhaProva = buffReadProva.readLine();
+
+		Integer count = pegaNumeroDeProvasPorIdDisciplina(idDisciplina);
+
+		Integer aux = 0;
+		ProvaDTO[] provas = new ProvaDTO[count];
+		while (true) {
+
+			if (linhaProva != null) {
+
+				String segments[] = linhaProva.split(";");
+
+				if (segments[4].equals(idDisciplina.toString())) {
+					Conversor conversor = new Conversor();
+					provas[aux] = conversor.provaSimplesConverter(leitorDeProva(Integer.parseInt(segments[0])));
+					aux++;
+				}
+
+			} else
+				break;
+			linhaProva = buffReadProva.readLine();
+		}
+		buffReadProva.close();
+
+		return provas;
+	}
+
 	// Adiciona materia no arquivo txt
 	public void insereMateria(Materia materia) throws IOException {
 		String nomeArquivo = "Materia.txt";
@@ -543,11 +647,12 @@ public class ManipuladorArquivo {
 	}
 
 	// Adiciona questao no arquivo txt
-	public void insereQuestao(Questao questao) throws IOException {
+	public Questao insereQuestao(Questao questao) throws IOException {
 		String nomeArquivo = "Questao.txt";
 		File arq = new File("files/", nomeArquivo);
 
-		String conteudo = retornarIdValido(nomeArquivo) + ";" + questao.getStatus() + ";" + questao.getTipo() + ";"
+		questao.setId((long) retornarIdValido(nomeArquivo));
+		String conteudo = questao.getId() + ";" + questao.getStatus() + ";" + questao.getTipo() + ";"
 				+ questao.getDissetacao() + ";" + questao.getContador() + ";" + questao.getDificuldade() + ";"
 				+ questao.getDisciplina().getId() + "\n";
 		FileWriter writer = new FileWriter(arq, true);
@@ -558,6 +663,7 @@ public class ManipuladorArquivo {
 		print.close();
 		writer.close();
 
+		return questao;
 	}
 
 	// Adiciona alternativa no arquivo txt
@@ -585,24 +691,25 @@ public class ManipuladorArquivo {
 		BufferedReader buffReadProvaQ = new BufferedReader(new FileReader("files/" + nomeArquivo + ".txt"));
 		String linhaProvaQuestao = buffReadProvaQ.readLine();
 		Integer numQuestoes = pegaNumeroDeLinhas(nomeArquivo);
-		String[] ids = new String[numQuestoes];
-		int count = 0;
+
+		PilhaInteger pilhaDeIds = new PilhaInteger();
+
 		while (true) {
 
 			if (linhaProvaQuestao != null) {
 
 				String segments[] = linhaProvaQuestao.split(";");
-				ids[count] = segments[0];
-				count++;
+				pilhaDeIds.push(Integer.parseInt(segments[0]));
 			} else
 				break;
 			linhaProvaQuestao = buffReadProvaQ.readLine();
 		}
 		buffReadProvaQ.close();
-
+		int size = pilhaDeIds.size();
 		Questao[] questoes = new Questao[numQuestoes];
-		for (int i = 0; i < ids.length; i++) {
-			questoes[i] = pegaQuestao(Integer.parseInt(ids[i]));
+		for (int i = 0; i < size; i++) {
+			questoes[i] = pegaQuestao(pilhaDeIds.top());
+			pilhaDeIds.pop();
 		}
 
 		return questoes;
@@ -654,9 +761,9 @@ public class ManipuladorArquivo {
 		return questoesMateria;
 	}
 
-	public Integer[] gerarListaAleatoria(Integer tamanhoLista) {
+	public ListaEncadeadaInteger gerarListaAleatoria(Integer tamanhoLista) {
 
-		Integer[] lista = new Integer[tamanhoLista];
+		ListaEncadeadaInteger listaE = new ListaEncadeadaInteger();
 		int find = 0;
 		int c, i = 0;
 		int[] num = new int[tamanhoLista];
@@ -682,10 +789,10 @@ public class ManipuladorArquivo {
 		}
 
 		for (i = 0; i < num.length; i++) {
-			lista[i] = num[i] - 1;
+			listaE.add(num[i] - 1, i + 1);
 		}
 
-		return lista;
+		return listaE;
 	}
 
 	public Prova gerarProva(Prova prova, Integer idDisciplina, Integer quantQuestoes) throws IOException {
@@ -693,28 +800,26 @@ public class ManipuladorArquivo {
 		String nomeArquivo = "Prova.txt";
 		File arq = new File("files/", nomeArquivo);
 		Integer id = retornarIdValido(nomeArquivo);
-
-		String conteudo = id + ";" + prova.getData() + "; " + prova.getNota() + ";" + prova.getAluno().getId() + "\n";
+		prova.setId((long) id);
+		String conteudo = prova.getId() + ";" + prova.getData() + ";" + prova.getNota() + ";" + prova.getAluno().getId()
+				+ ";" + idDisciplina + "\n";
 
 		Questao[] questoesMaterias = pegarQuestoesPorMateria(idDisciplina);
 
 		if (quantQuestoes > questoesMaterias.length) {
-			// TODO erro
-			System.out.println("erro");
-		}
-		for (Questao questao : questoesMaterias) {
-			System.out.println("teste 1");
-			System.out.println(questao);
+			JOptionPane.showMessageDialog(null,
+					"Quantidade de questões não disponivel. Disponibilidade: " + questoesMaterias.length);
+			throw new ErroException("Quantidade de questões não disponivel");
 		}
 
-		Integer[] ordemAleatoria = gerarListaAleatoria(questoesMaterias.length);
+		ListaEncadeadaInteger ordemAleatoria = gerarListaAleatoria(questoesMaterias.length);
 
 		Questao[] questoesSelecionadas = new Questao[quantQuestoes];
 
 		for (int i = 0; i < questoesSelecionadas.length; i++) {
 
 			ProvaQuestao provaQuestao = new ProvaQuestao();
-			provaQuestao.setIdQuestao(questoesMaterias[ordemAleatoria[i]].getId());
+			provaQuestao.setIdQuestao(questoesMaterias[ordemAleatoria.show(i + 1)].getId());
 			provaQuestao.setIdProva((long) id);
 			insereProvaQuestao(provaQuestao);
 		}
@@ -727,7 +832,7 @@ public class ManipuladorArquivo {
 		print.close();
 		writer.close();
 
-		return null;
+		return prova;
 	}
 
 	// Adiciona vinculacao entra prova e questao;
@@ -749,7 +854,7 @@ public class ManipuladorArquivo {
 	}
 
 	public Prova corrigirProva(Double nota, Integer idProva) throws IOException {
-
+		System.out.println("entrou");
 		String arquivo = "files/Prova.txt";
 		String arquivoTmp = "files/Prova-tmp";
 
@@ -809,5 +914,89 @@ public class ManipuladorArquivo {
 		}
 		String segments[] = ultimo.split(";");
 		return Integer.parseInt(segments[0]) + 1;
+	}
+
+	public static Double[] quickSort(Double v[], int esquerda, int direita) {
+		int esq = esquerda;
+		int dir = direita;
+		Double pivo = v[(esq + dir) / 2];
+		Double troca;
+
+		while (esq <= dir) {
+			while (v[esq] < pivo) {
+				esq = esq + 1;
+			}
+			while (v[dir] > pivo) {
+				dir = dir - 1;
+			}
+			if (esq <= dir) {
+				troca = v[esq];
+				v[esq] = v[dir];
+				v[dir] = troca;
+				esq = esq + 1;
+				dir = dir - 1;
+			}
+		}
+		if (dir > esquerda)
+			quickSort(v, esquerda, dir);
+
+		if (esq < direita)
+			quickSort(v, esq, direita);
+		return v;
+
+	}
+
+	public ListaEncadeadaProva ranking(Integer idDisciplina) throws IOException {
+
+		ProvaDTO[] provasEncontradas = pegarProvaPorMateria(idDisciplina);
+
+		Double[] notas = new Double[provasEncontradas.length];
+
+		for (int i = 0; i < provasEncontradas.length; i++) {
+			notas[i] = provasEncontradas[i].getNota();
+		}
+
+		// ordena vetor de notas
+		notas = quickSort(notas, 0, notas.length - 1);
+
+		// Adiciona na pilha todas as notas ordenadas;
+		PilhaDouble pilha = new PilhaDouble();
+		for (int i = 0; i < notas.length; i++) {
+			pilha.push(notas[i]);
+		}
+
+		Integer size = pilha.size();
+		ListaEncadeadaInteger idsAlreadySelected = new ListaEncadeadaInteger();
+		ListaEncadeadaProva provasNoTopo = new ListaEncadeadaProva();
+
+		// Para cada posicao na pilha
+		for (int i = 1; i <= size; i++) {
+
+			// adiciona na lista de provas uma prova correspondente aquela nota
+			for (ProvaDTO prova : provasEncontradas) {
+				//Encontra prova corespondente aquela nota
+				if (prova.getNota() == pilha.top()) {
+					
+					//Verifica se aquela prova daquele id ja foi adicionado
+					// (caso a nota se repita entre alunos)
+					Boolean achou = false;
+					for (int j = 1; j < idsAlreadySelected.size(); j++) {
+						if ((int) (long) prova.getId() == idsAlreadySelected.show(j)) {
+							achou = true;
+						}
+					}
+					if (achou == false) {
+						provasNoTopo.add(prova, i);
+						idsAlreadySelected.add((int) (long) prova.getId(), i);
+					}
+
+				}
+
+			}
+			pilha.pop();
+		}
+
+		return provasNoTopo;
+
 	}
 }

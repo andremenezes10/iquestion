@@ -91,4 +91,14 @@ public class Conversor {
 
 		return provaDTO;
 	}
+	public ProvaDTO provaSimplesConverter(Prova prova) {
+
+		ProvaDTO provaDTO = new ProvaDTO();
+
+		provaDTO.setId(prova.getId());
+		provaDTO.setData(prova.getData());
+		provaDTO.setNota(prova.getNota());
+		provaDTO.setAluno(alunoConverter(prova.getAluno()));
+		return provaDTO;
+	}
 }

@@ -49,6 +49,10 @@ public class CadastroMateria extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
+		JButton btnVoltar = new JButton("Voltar");
+		btnVoltar.setBounds(10, 10, 109, 23);
+		contentPane.add(btnVoltar);
+
 		JLabel lblNewLabel = new JLabel("Materia");
 		lblNewLabel.setBounds(20, 119, 61, 16);
 		contentPane.add(lblNewLabel);
@@ -70,11 +74,12 @@ public class CadastroMateria extends JFrame {
 
 					Materia materia = new Materia();
 					materia.setNome(textField.getText());
-				
+
 					ManipuladorArquivo manipula = new ManipuladorArquivo();
 					try {
 						manipula.insereMateria(materia);
 						JOptionPane.showMessageDialog(null, "Materia cadastrada com sucesso.");
+						CloseFrame();
 					} catch (IOException e1) {
 						e1.printStackTrace();
 						JOptionPane.showMessageDialog(null, "Erro. Revise os dados e tente novamente");
@@ -83,5 +88,18 @@ public class CadastroMateria extends JFrame {
 				}
 			}
 		});
+
+		btnVoltar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CloseFrame();
+
+			}
+		});
+
+	}
+
+	public void CloseFrame() {
+		super.dispose();
+		new MenuAdmin().setVisible(true);
 	}
 }

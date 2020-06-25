@@ -8,12 +8,19 @@ public class ProvaDTO {
 	private Double nota;
 	private AlunoDTO aluno;
 	private QuestaoDTO questoes[];
+	private DisciplinaDTO disciplinaDTO;
 
 	public ProvaDTO() {
 		AlunoDTO aluno = new AlunoDTO();
 		this.aluno = aluno;
 	}
-
+	
+	public ProvaDTO(ProvaDTO prova) {
+		this.id = prova.id;
+		this.data = prova.data;
+		this.nota = prova.nota;
+		this.aluno = prova.aluno;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -54,10 +61,18 @@ public class ProvaDTO {
 		this.questoes = questoes;
 	}
 
+	public DisciplinaDTO getDisciplinaDTO() {
+		return disciplinaDTO;
+	}
+
+	public void setDisciplinaDTO(DisciplinaDTO disciplinaDTO) {
+		this.disciplinaDTO = disciplinaDTO;
+	}
+
 	@Override
 	public String toString() {
 		return "ProvaDTO [id=" + id + ", data=" + data + ", nota=" + nota + ", aluno=" + aluno + ", questoes="
-				+ Arrays.toString(questoes) + "]";
+				+ Arrays.toString(questoes) + ", disciplinaDTO=" + disciplinaDTO + "]";
 	}
 
 }

@@ -11,7 +11,7 @@ public class AlunoController {
 
 		ManipuladorArquivo arq = new ManipuladorArquivo();
 
-		Aluno aluno = arq.login(key, password);
+		Aluno aluno = arq.loginAluno(key, password);
 		if (aluno.getId() == null) {
 			throw new InvalidLoginOrPassword();
 		}

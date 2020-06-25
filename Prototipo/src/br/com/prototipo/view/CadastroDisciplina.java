@@ -46,9 +46,9 @@ public class CadastroDisciplina extends JFrame {
 	 * Create the frame.
 	 */
 	public CadastroDisciplina() {
-		ManipuladorArquivo maniplula = new ManipuladorArquivo();
+		ManipuladorArquivo manipula = new ManipuladorArquivo();
 		try {
-			materias = maniplula.pegarTodasMaterias();
+			materias = manipula.pegarTodasMaterias();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(null, "Não foi possivel recuperar matérias");
@@ -56,18 +56,22 @@ public class CadastroDisciplina extends JFrame {
 		}
 		setTitle("Cadastro de Disciplina");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 295, 199);
+		setBounds(100, 100, 295, 299);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
+		JButton btnVoltar = new JButton("Voltar");
+		btnVoltar.setBounds(10, 10, 109, 23);
+		contentPane.add(btnVoltar);
+		
 		JLabel lblNewLabel = new JLabel("Nome da Disciplina:");
-		lblNewLabel.setBounds(10, 11, 141, 14);
+		lblNewLabel.setBounds(80, 70, 141, 14);
 		contentPane.add(lblNewLabel);
 
 		textField = new JTextField();
-		textField.setBounds(10, 36, 141, 20);
+		textField.setBounds(80, 90, 141, 20);
 		contentPane.add(textField);
 		textField.setColumns(10);
 
@@ -75,15 +79,15 @@ public class CadastroDisciplina extends JFrame {
 		for (Materia materia : materias) {
 			comboBox.addItem(materia.getNome());
 		}
-		comboBox.setBounds(10, 92, 141, 20);
+		comboBox.setBounds(80, 160, 141, 20);
 		contentPane.add(comboBox);
 
-		JLabel lblNewLabel_1 = new JLabel("Mat\u00E9ria:");
-		lblNewLabel_1.setBounds(10, 67, 46, 14);
+		JLabel lblNewLabel_1 = new JLabel("Matéria:");
+		lblNewLabel_1.setBounds(80, 140, 80, 14);
 		contentPane.add(lblNewLabel_1);
 
 		JButton btnNewButton = new JButton("Cadastrar");
-		btnNewButton.setBounds(157, 126, 112, 23);
+		btnNewButton.setBounds(157, 220, 112, 23);
 		contentPane.add(btnNewButton);
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -100,8 +104,9 @@ public class CadastroDisciplina extends JFrame {
 							disciplina.setNome(textField.getText());
 
 							try {
-								maniplula.insereDisciplina(disciplina);
+								manipula.insereDisciplina(disciplina);
 								JOptionPane.showMessageDialog(null, "Disciplina cadastrada com sucesso.");
+								CloseFrame();
 							} catch (IOException e1) {
 								// TODO Auto-generated catch block
 								JOptionPane.showMessageDialog(null, "Erro. Revise os dados e tente novamente");
@@ -114,5 +119,18 @@ public class CadastroDisciplina extends JFrame {
 				}
 			}
 		});
+		
+		btnVoltar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CloseFrame();
+
+			}
+		});
+
+	}
+
+	public void CloseFrame() {
+		super.dispose();
+		new MenuAdmin().setVisible(true);
 	}
 }

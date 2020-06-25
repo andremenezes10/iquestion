@@ -29,25 +29,6 @@ public class CadastroAluno extends JFrame {
 	private JPasswordField passwordField;
 	private JComboBox comboBox;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					CadastroAluno frame = new CadastroAluno();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the frame.
-	 */
 	public CadastroAluno() {
 		setTitle("Cadastro de Aluno");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,6 +37,10 @@ public class CadastroAluno extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+
+		JButton btnVoltar = new JButton("Voltar");
+		btnVoltar.setBounds(5, 5, 105, 15);
+		contentPane.add(btnVoltar);
 
 		JButton btnNewButton = new JButton("Cadastrar");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -73,15 +58,16 @@ public class CadastroAluno extends JFrame {
 					Aluno aluno = new Aluno();
 					aluno.setNome(textField.getText());
 					aluno.setCpf(textField_1.getText());
-					aluno.setEmail(textField_3.getText());
+					aluno.setEmail(textField_2.getText());
 					aluno.setSenha(password);
 
 					aluno.setSexo(comboBox.getSelectedItem().toString());
-					aluno.setTelefone(textField_2.getText());
+					aluno.setTelefone(textField_3.getText());
 					ManipuladorArquivo manipula = new ManipuladorArquivo();
 					try {
 						manipula.insereAluno(aluno);
 						JOptionPane.showMessageDialog(null, "Aluno cadastrado com sucesso.");
+						CloseFrame();
 					} catch (IOException e1) {
 
 						e1.printStackTrace();
@@ -167,5 +153,19 @@ public class CadastroAluno extends JFrame {
 		});
 		chckbxNewCheckBox.setBounds(95, 291, 128, 23);
 		contentPane.add(chckbxNewCheckBox);
+
+		btnVoltar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CloseFrame();
+
+			}
+		});
+
 	}
+
+	public void CloseFrame() {
+		super.dispose();
+		new TelaDeLogin().setVisible(true);
+	}
+
 }

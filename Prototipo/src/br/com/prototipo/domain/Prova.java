@@ -5,6 +5,7 @@ public class Prova {
 	private String data;
 	private Double nota;
 	private Aluno aluno;
+	private Disciplina disciplina;
 
 	public Prova() {
 		Aluno aluno = new Aluno();
@@ -41,6 +42,14 @@ public class Prova {
 
 	public void setAluno(Aluno aluno) {
 		this.aluno = aluno;
+	}
+
+	public Disciplina getDisciplina() {
+		return disciplina;
+	}
+
+	public void setDisciplina(Disciplina disciplina) {
+		this.disciplina = disciplina;
 	}
 
 	@Override
